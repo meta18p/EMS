@@ -8,6 +8,7 @@ import { toast } from "react-toastify"
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [selectedRole, setSelectedRole] = useState("employee")
   const { login } = useContext(AuthContext)
   const navigate = useNavigate()
 
@@ -15,7 +16,15 @@ const Login = () => {
     e.preventDefault()
     try {
       const user = await login(email, password)
+
+      // Check if the user's role matches the selected role
+      if (user.role !== selectedRole) {
+        toast.warning(`You've logged in as a ${user.role}, not as a ${selectedRole}`)
+      }
+
       toast.success("Login successful!")
+
+      // Redirect based on actual user role, not selected role
       if (user.role === "manager") {
         navigate("/manager")
       } else {
@@ -44,7 +53,7 @@ const Login = () => {
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-gray-700 mb-2" htmlFor="password">
               Password
             </label>
@@ -56,6 +65,33 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 mb-2">Login As</label>
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="employee"
+                  checked={selectedRole === "employee"}
+                  onChange={() => setSelectedRole("employee")}
+                  className="mr-2"
+                />
+                <span>Employee</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="manager"
+                  checked={selectedRole === "manager"}
+                  onChange={() => setSelectedRole("manager")}
+                  className="mr-2"
+                />
+                <span>Manager</span>
+              </label>
+            </div>
           </div>
           <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
             Login
